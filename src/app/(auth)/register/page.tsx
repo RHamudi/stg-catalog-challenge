@@ -1,6 +1,6 @@
 'use client';
 
-import { UserAuth } from "@/context/authContext";
+import { UserAuth } from "@/app/context/authContext";
 import { useState } from "react";
 
 export default function Register() {

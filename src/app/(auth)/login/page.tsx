@@ -1,5 +1,5 @@
 'use client';
-import { UserAuth } from "@/context/authContext";
+import { UserAuth } from "@/app/context/authContext";
 import { useState } from "react";
 
 export default function Login() {
@@ -11,8 +11,8 @@ export default function Login() {
 
     const handleSingIn = async (e: any) => {
         e.preventDefault();
-        const { data, error } = await signInUser(email, password);
-
+        setLoading(true);
+        const { success, data, error } = await signInUser(email, password);
         if (error) {
             console.log(error)
         }
@@ -20,6 +20,7 @@ export default function Login() {
         if (data) {
             console.log(data)
         }
+        setLoading(false);
     }
 
     return (
