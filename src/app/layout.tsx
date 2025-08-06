@@ -1,5 +1,5 @@
 import "./globals.css";
-import { AuthContextProvider } from "@/app/context/authContext";
+import { AuthContextProvider } from "@/context/authContext";
 
 export default function RootLayout({
   children,
