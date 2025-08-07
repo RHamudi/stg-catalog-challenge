@@ -1,17 +1,7 @@
 "use client"
-import { useState } from 'react';
-
-interface CartItem {
-    id: number;
-    name: string;
-    price: number;
-    quantity: number;
-    image: string;
-    color?: string;
-    storage?: string;
-    material?: string;
-    wireless?: boolean;
-}
+import { useCart } from '@/context/cartContext';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface Coupon {
     code: string;
@@ -20,52 +10,18 @@ interface Coupon {
 }
 
 export default function ShoppingCart() {
-    const [cartItems, setCartItems] = useState<CartItem[]>([
-        {
-            id: 1,
-            name: "Smartphone Galaxy A54",
-            price: 1299.99,
-            quantity: 1,
-            image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=300&fit=crop",
-            color: "Preto",
-            storage: "128GB"
-        },
-        {
-            id: 2,
-            name: "Fone de Ouvido Bluetooth",
-            price: 299.99,
-            quantity: 2,
-            image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop",
-            color: "Branco",
-            wireless: true
-        },
-        {
-            id: 3,
-            name: "Capa Protetora Premium",
-            price: 59.99,
-            quantity: 1,
-            image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=300&h=300&fit=crop",
-            color: "Transparente",
-            material: "Silicone"
-        }
-    ]);
-
     const [couponCode, setCouponCode] = useState<string>('');
     const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const updateQuantity = (id: number, newQuantity: number): void => {
-        if (newQuantity < 1) return;
-        setCartItems(items =>
-            items.map(item =>
-                item.id === id ? { ...item, quantity: newQuantity } : item
-            )
-        );
-    };
-
-    const removeItem = (id: number): void => {
-        setCartItems(items => items.filter(item => item.id !== id));
-    };
+    const {
+        cartItems,
+        removeFromCart,
+        updateQuantity,
+        getCartTotal,
+        getCartCount,
+        isLoading: cartLoading
+    } = useCart();
 
     const applyCoupon = (): void => {
         setIsLoading(true);
@@ -85,7 +41,7 @@ export default function ShoppingCart() {
         setAppliedCoupon(null);
     };
 
-    const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = getCartTotal();
     const shipping = subtotal > 500 ? 0 : 29.99;
     const couponDiscount = appliedCoupon ?
         (appliedCoupon.type === 'percentage' ? subtotal * appliedCoupon.discount : 0) : 0;
@@ -100,6 +56,15 @@ export default function ShoppingCart() {
         }, 2000);
     };
 
+    const handleRemoveItem = async (itemId: string) => {
+        await removeFromCart(itemId);
+    };
+
+    const handleUpdateQuantity = async (itemId: string, newQuantity: number) => {
+        if (newQuantity < 1) return;
+        await updateQuantity(itemId, newQuantity);
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
             {/* Header */}
@@ -107,14 +72,14 @@ export default function ShoppingCart() {
                 <div className="max-w-7xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <button
+                            <Link href={'/products'}
                                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                                 aria-label="Voltar"
                             >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                 </svg>
-                            </button>
+                            </Link >
                             <h1 className="text-2xl font-bold text-gray-900">Meu Carrinho</h1>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -142,120 +107,137 @@ export default function ShoppingCart() {
                                 </button>
                             </div>
 
-                            <div className="space-y-6">
-                                {cartItems.map((item) => (
-                                    <div key={item.id} className="flex gap-4 p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
-                                        <div className="flex-shrink-0">
-                                            <img
-                                                src={item.image}
-                                                alt={item.name}
-                                                className="w-24 h-24 object-cover rounded-lg"
-                                            />
-                                        </div>
+                            {cartLoading ? (
+                                <div className="flex items-center justify-center py-12">
+                                    <div className="w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                                    <span className="ml-3 text-gray-600">Carregando carrinho...</span>
+                                </div>
+                            ) : cartItems.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                                    </svg>
+                                    <h3 className="text-lg font-medium text-gray-900 mb-2">Seu carrinho está vazio</h3>
+                                    <p className="text-gray-500 mb-4">Adicione alguns produtos para começar suas compras!</p>
+                                    <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                                        Ver Produtos
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-6">
+                                    {cartItems.map((item) => (
+                                        <div key={item.id} className="flex gap-4 p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+                                            <div className="flex-shrink-0">
+                                                <img
+                                                    src={item.products.image_url}
+                                                    alt={item.products.name}
+                                                    className="w-24 h-24 object-cover rounded-lg"
+                                                />
+                                            </div>
 
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div>
-                                                    <h3 className="font-semibold text-gray-900 mb-1">{item.name}</h3>
-                                                    <div className="flex gap-4 text-sm text-gray-600">
-                                                        {item.color && <span>Cor: {item.color}</span>}
-                                                        {item.storage && <span>Armazenamento: {item.storage}</span>}
-                                                        {item.material && <span>Material: {item.material}</span>}
-                                                        {item.wireless && <span>Sem fio: Sim</span>}
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div>
+                                                        <h3 className="font-semibold text-gray-900 mb-1">{item.products.name}</h3>
+                                                        <div className="flex gap-4 text-sm text-gray-600">
+                                                            {/* Propriedades opcionais do produto podem ser adicionadas aqui */}
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleRemoveItem(item.id!)}
+                                                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                                        aria-label={`Remover ${item.products.name} do carrinho`}
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+
+                                                <div className="flex justify-between items-center">
+                                                    <div className="flex items-center gap-3">
+                                                        <button
+                                                            onClick={() => handleUpdateQuantity(item.id!, item.quantity - 1)}
+                                                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                                            aria-label="Diminuir quantidade"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                                            </svg>
+                                                        </button>
+                                                        <span className="w-8 text-center font-medium" aria-label={`Quantidade: ${item.quantity}`}>{item.quantity}</span>
+                                                        <button
+                                                            onClick={() => handleUpdateQuantity(item.id!, item.quantity + 1)}
+                                                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                                            aria-label="Aumentar quantidade"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-lg font-bold text-gray-900">
+                                                            R$ {(item.products.price * item.quantity).toFixed(2).replace('.', ',')}
+                                                        </p>
+                                                        {item.quantity > 1 && (
+                                                            <p className="text-sm text-gray-500">
+                                                                R$ {item.products.price.toFixed(2).replace('.', ',')} cada
+                                                            </p>
+                                                        )}
                                                     </div>
                                                 </div>
-                                                <button
-                                                    onClick={() => removeItem(item.id)}
-                                                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                                    aria-label={`Remover ${item.name} do carrinho`}
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-
-                                            <div className="flex justify-between items-center">
-                                                <div className="flex items-center gap-3">
-                                                    <button
-                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                                                        aria-label="Diminuir quantidade"
-                                                    >
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                                                        </svg>
-                                                    </button>
-                                                    <span className="w-8 text-center font-medium" aria-label={`Quantidade: ${item.quantity}`}>{item.quantity}</span>
-                                                    <button
-                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                                                        aria-label="Aumentar quantidade"
-                                                    >
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-lg font-bold text-gray-900">
-                                                        R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
-                                                    </p>
-                                                    {item.quantity > 1 && (
-                                                        <p className="text-sm text-gray-500">
-                                                            R$ {item.price.toFixed(2).replace('.', ',')} cada
-                                                        </p>
-                                                    )}
-                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
 
                             {/* Cupom de Desconto */}
-                            <div className="mt-8 p-4 bg-gray-50 rounded-xl">
-                                <h3 className="font-semibold text-gray-900 mb-3">Cupom de Desconto</h3>
-                                {appliedCoupon ? (
-                                    <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
-                                        <div className="flex items-center gap-2">
-                                            <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            <span className="font-medium text-green-800">
-                                                Cupom "{appliedCoupon.code}" aplicado!
-                                            </span>
+                            {cartItems.length > 0 && (
+                                <div className="mt-8 p-4 bg-gray-50 rounded-xl">
+                                    <h3 className="font-semibold text-gray-900 mb-3">Cupom de Desconto</h3>
+                                    {appliedCoupon ? (
+                                        <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                                            <div className="flex items-center gap-2">
+                                                <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span className="font-medium text-green-800">
+                                                    Cupom "{appliedCoupon.code}" aplicado!
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={removeCoupon}
+                                                className="text-green-600 hover:text-green-700 text-sm"
+                                            >
+                                                Remover
+                                            </button>
                                         </div>
-                                        <button
-                                            onClick={removeCoupon}
-                                            className="text-green-600 hover:text-green-700 text-sm"
-                                        >
-                                            Remover
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            placeholder="Digite seu cupom"
-                                            value={couponCode}
-                                            onChange={(e) => setCouponCode(e.target.value)}
-                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            aria-label="Código do cupom"
-                                        />
-                                        <button
-                                            onClick={applyCoupon}
-                                            disabled={!couponCode || isLoading}
-                                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                        >
-                                            {isLoading ? 'Aplicando...' : 'Aplicar'}
-                                        </button>
-                                    </div>
-                                )}
-                                <p className="text-xs text-gray-500 mt-2">
-                                    Cupons válidos: DESCONTO10, FRETE20
-                                </p>
-                            </div>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Digite seu cupom"
+                                                value={couponCode}
+                                                onChange={(e) => setCouponCode(e.target.value)}
+                                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                aria-label="Código do cupom"
+                                            />
+                                            <button
+                                                onClick={applyCoupon}
+                                                disabled={!couponCode || isLoading}
+                                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                                {isLoading ? 'Aplicando...' : 'Aplicar'}
+                                            </button>
+                                        </div>
+                                    )}
+                                    <p className="text-xs text-gray-500 mt-2">
+                                        Cupons válidos: DESCONTO10, FRETE20
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -293,7 +275,7 @@ export default function ShoppingCart() {
                                     </div>
                                 )}
 
-                                {subtotal <= 500 && (
+                                {subtotal <= 500 && subtotal > 0 && (
                                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                                         <p className="text-sm text-blue-800">
                                             <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
