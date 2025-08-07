@@ -1,5 +1,7 @@
+'use client';
+
 import { supabase } from "../lib/supabase";
-import { IProduct } from "../types";
+import { ICart, IProduct } from "../types";
 
 export const getAllProducts = async (): Promise<IProduct[]> => {
     const { data: products, error } = await supabase.from("products").select('*');
@@ -10,4 +12,63 @@ export const getAllProducts = async (): Promise<IProduct[]> => {
     }
 
     return products || [];
-} 
+}
+
+export const AddProductCart  = async (cartModal: ICart): Promise<any> => {
+    const {data: cart, error} = await supabase.from('cart_items')
+    .insert([
+        cartModal
+    ]);
+
+    if(error) {
+        console.log("erro ao adicionar ao carrinho", error.message)
+    } else {
+        console.log("Item adicionado", cart)
+    }
+
+    return cart;
+}
+
+export const GetUserCart = async (userId: string): Promise<any> => {
+    const { data, error } = await supabase.from('cart_items')
+    .select(`id,
+            quantity,
+            product_id,
+            products (
+                id,
+                name,
+                price,
+                description,
+                image_url,
+                category)`).eq('user_id', userId);
+
+    return data;
+}
+
+export const RemoveFromCart = async (itemId: string): Promise<any> => {
+    const { data, error } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq('id', itemId);
+
+    if (error) {
+        console.error("Erro ao remover item do carrinho: ", error.message);
+        throw new Error(`Erro ao remover item do carrinho: ${error.message}`);
+    }
+
+    return data;
+}
+
+export const UpdateCartItemQuantity = async (itemId: string, newQuantity: number): Promise<any> => {
+    const { data, error } = await supabase
+        .from('cart_items')
+        .update({ quantity: newQuantity })
+        .eq('id', itemId);
+
+    if (error) {
+        console.error("Erro ao atualizar quantidade: ", error.message);
+        throw new Error(`Erro ao atualizar quantidade: ${error.message}`);
+    }
+
+    return data;
+}
