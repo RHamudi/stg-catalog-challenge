@@ -11,7 +11,8 @@ interface AuthContextType {
     session: Session | null;
     signUpNewUser: (email: string, password: string, name: string) => Promise<{ success?: boolean; error?: string; data?: any }>;
     signInUser: (email: string, password: string) => Promise<{ success?: boolean; error?: string; data?: any }>;
-    products: IProduct[]
+    products: IProduct[],
+    Logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,6 +20,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [session, setSession] = useState<Session | null>(null);
     const [products, setProducts] = useState<IProduct[]>([]);
+
+    const Logout = () => {
+        setSession(null);
+        supabase.auth.signOut();
+    }
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -39,7 +45,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     }, []);
 
     return (
-        <AuthContext.Provider value={{ session, signUpNewUser, signInUser, products }}>
+        <AuthContext.Provider value={{ session, signUpNewUser, signInUser, products, Logout }}>
             {children}
         </AuthContext.Provider>
     )

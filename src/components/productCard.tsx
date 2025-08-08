@@ -1,16 +1,34 @@
+'use client'
 import React, { useState } from 'react';
 import { IProduct } from '../types';
+import { UserAuth } from '@/context/authContext';
+import { useCart } from '@/context/cartContext';
+import { useRouter } from 'next/navigation';
+
 
 const ProductCard = ({ product }: { product: IProduct }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [imageError, setImageError] = useState(false);
+    const router = useRouter();
+    const { session } = UserAuth();
+    const { addToCart } = useCart();
 
-    const handleAddToCart = async () => {
+    const handleAddToCart = async (productId: string) => {
+        if (!session) {
+            alert('Faça login para adicionar produtos ao carrinho!');
+            return;
+        }
+
         setIsLoading(true);
-        // Simula uma operação assíncrona
-        await new Promise(resolve => setTimeout(resolve, 800));
-        setIsLoading(false);
-        alert(`${product.name} adicionado ao carrinho!`);
+        try {
+            await addToCart(productId, 1);
+            alert(`${product.name} adicionado ao carrinho!`);
+        } catch (error) {
+            console.error('Erro ao adicionar ao carrinho:', error);
+            alert('Erro ao adicionar produto ao carrinho. Tente novamente.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const formatPrice = (price: number) => {
@@ -22,6 +40,10 @@ const ProductCard = ({ product }: { product: IProduct }) => {
 
     const handleImageError = () => {
         setImageError(true);
+    };
+
+    const handleClick = (id: string) => {
+        router.push(`/products/${id}`);
     };
 
     return (
@@ -53,7 +75,7 @@ const ProductCard = ({ product }: { product: IProduct }) => {
 
                 {/* Quick View Overlay */}
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <button className="bg-white text-green-600 px-4 py-2 rounded-full font-medium transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <button onClick={() => handleClick(product.id)} className="bg-white text-green-600 px-4 py-2 rounded-full font-medium transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                         Visualizar
                     </button>
                 </div>
@@ -87,7 +109,7 @@ const ProductCard = ({ product }: { product: IProduct }) => {
                 {/* Action Buttons */}
                 <div className="flex gap-2 pt-2">
                     <button
-                        onClick={handleAddToCart}
+                        onClick={() => handleAddToCart(product.id)}
                         disabled={isLoading}
                         className={`flex-1 bg-gradient-to-r from-green-600 to-green-500 text-white py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${isLoading
                             ? 'opacity-70 cursor-not-allowed'
@@ -104,10 +126,6 @@ const ProductCard = ({ product }: { product: IProduct }) => {
                                 🛒 Adicionar
                             </>
                         )}
-                    </button>
-
-                    <button className="bg-green-50 text-green-600 p-3 rounded-xl transition-all duration-300 hover:bg-green-100 hover:-translate-y-0.5 group">
-                        <span className="group-hover:scale-110 transition-transform duration-200 block">❤️</span>
                     </button>
                 </div>
             </div>
