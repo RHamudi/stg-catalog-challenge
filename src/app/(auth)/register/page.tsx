@@ -2,6 +2,7 @@
 
 import { UserAuth } from "@/context/authContext";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Register() {
@@ -9,6 +10,7 @@ export default function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const { signUpNewUser } = UserAuth();
 
@@ -21,7 +23,7 @@ export default function Register() {
         }
 
         if (data) {
-            console.log(data);
+            router.push('/login')
         }
     }
 
@@ -31,7 +33,7 @@ export default function Register() {
                 <h2 className="text-3xl font-bold text-green-700 mb-6 text-center">
                     Criar Conta
                 </h2>
-                <form className="space-y-5">
+                <form onSubmit={handleSingUp} className="space-y-5">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Nome
@@ -40,6 +42,7 @@ export default function Register() {
                             type="text"
                             placeholder="Seu nome"
                             className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                            onChange={(e) => setName(e.target.value)}
                         />
                     </div>
 
@@ -51,6 +54,7 @@ export default function Register() {
                             type="email"
                             placeholder="seuemail@email.com"
                             className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
 
@@ -62,6 +66,7 @@ export default function Register() {
                             type="password"
                             placeholder="********"
                             className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
 

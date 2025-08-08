@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/navbar";
 import ProductCard from "../components/productCard";
 import { UserAuth } from "../context/authContext";
+import Link from "next/link";
 
 const Home = () => {
   const { products } = UserAuth();
@@ -17,24 +18,21 @@ const Home = () => {
         <div className="max-w-[1200px] mx-auto px-8 grid md:grid-cols-2 gap-16 items-center">
           <div className="space-y-6">
             <h1 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-br from-gray-700 to-green-500 bg-clip-text text-transparent animate-slide-in-left">
-              Produtos Sustentáveis para um Futuro Verde
+              Ofertas incríveis, entrega rápida e qualidade garantida.
             </h1>
             <p className="text-lg text-gray-500 animate-slide-in-left animation-delay-200">
-              Descubra nossa coleção cuidadosamente selecionada de produtos ecológicos que fazem a diferença para você e para o planeta.
+              Produtos selecionados com qualidade, preço justo e entrega rápida para todo o Brasil. Encontre agora o que você procura.
             </p>
             <div className="flex gap-4 animate-slide-in-left animation-delay-400">
-              <button className="bg-gradient-to-br from-green-500 to-green-700 text-white py-3 px-6 rounded-full font-semibold shadow-md hover:shadow-lg transition-transform hover:-translate-y-1">
+              <Link href={'/products'} className="bg-gradient-to-br from-green-500 to-green-700 text-white py-3 px-6 rounded-full font-semibold shadow-md hover:shadow-lg transition-transform hover:-translate-y-1">
                 Explorar Produtos
-              </button>
-              <button className="border-2 border-green-500 text-green-600 py-3 px-6 rounded-full font-semibold hover:bg-green-500 hover:text-white transition-transform hover:-translate-y-1">
-                Saiba Mais
-              </button>
+              </Link >
             </div>
           </div>
           <div className="relative animate-slide-in-right">
             <div className="rounded-2xl overflow-hidden shadow-xl hover:scale-[1.05] transition-transform">
               <img
-                src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                src="homepage.jpg"
                 alt="Produtos Sustentáveis"
                 className="w-full h-[400px] object-cover"
               />

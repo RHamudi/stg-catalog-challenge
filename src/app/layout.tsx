@@ -1,6 +1,7 @@
 import "./globals.css";
 import { AuthContextProvider } from "@/context/authContext";
 import { CartContextProvider } from "@/context/cartContext";
+import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({
   children,
@@ -12,6 +13,7 @@ export default function RootLayout({
       <body>
         <AuthContextProvider>
           <CartContextProvider>
+            <Toaster position="top-right" reverseOrder={false} />
             {children}
           </CartContextProvider>
         </AuthContextProvider>

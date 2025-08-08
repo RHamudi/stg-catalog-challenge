@@ -1,11 +1,14 @@
 'use client';
 import { UserAuth } from "@/context/authContext";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const { signInUser } = UserAuth();
 
@@ -18,7 +21,8 @@ export default function Login() {
         }
 
         if (data) {
-            console.log(data)
+            toast.success('Successfully toasted!')
+            router.push('/products')
         }
         setLoading(false);
     }
