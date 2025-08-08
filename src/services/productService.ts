@@ -72,3 +72,16 @@ export const UpdateCartItemQuantity = async (itemId: string, newQuantity: number
 
     return data;
 }
+
+export const GetProductById = async (productId: string): Promise<any> => {
+    const { data, error } = await supabase.from('products')
+    .select('*').eq('id', productId)
+    .single();
+
+    if (error){
+        console.error("erro ao buscar produto")
+        throw new Error("erro ao buscar produto")
+    }
+
+    return data;
+}
