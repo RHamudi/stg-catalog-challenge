@@ -8,8 +8,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+type ProductPageProps = {
+    params: {
+        id: string;
+    };
+};
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
+export default function ProductDetailPage({ params }: any) {
     const [quantity, setQuantity] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [isProductLoading, setIsProductLoading] = useState(true);
