@@ -3,6 +3,7 @@ import Link from 'next/link';
 import React, { useState, useEffect, useRef } from 'react';
 import { UserAuth } from '@/context/authContext';
 import { useCart } from '@/context/cartContext';
+import { ShoppingCart } from 'lucide-react';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -80,9 +81,7 @@ const Navbar = () => {
                         <>
                             {/* Botão do Carrinho */}
                             <Link href={'/cart'} className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/30 flex items-center gap-2">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
-                                </svg>
+                                <ShoppingCart />
                                 Carrinho {getCartCount()}
                             </Link>
 
