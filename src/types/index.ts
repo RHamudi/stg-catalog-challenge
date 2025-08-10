@@ -26,7 +26,7 @@ export interface ILoginForm extends Record<string, string> {
 
 export interface IRegisterForm extends ILoginForm {
     confirmPassword: string;
-    name?: string;
+    name: string;
 }
 
 export interface IAuthResponse {
