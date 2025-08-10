@@ -6,26 +6,6 @@ import { Undo2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
-type OrderItem = {
-    id: string;
-    order_id: string;
-    product_name: string;
-    quantity: number;
-    unit_price: number;
-    total_price: number;
-};
-
-type Order = {
-    id: string;
-    created_at: string; // ISO date string
-    customer_name: string;
-    customer_email: string;
-    total_amount: number;
-    shipping: string | number; // pode ser "Free" ou número
-    notes: string | null;
-    order_items: OrderItem[];
-};
-
 export default function OrdersList() {
     const [orders, setOrders] = useState<IOrders[]>([]);
     const [selectedOrder, setSelectedOrder] = useState<IOrders | null>(null);
