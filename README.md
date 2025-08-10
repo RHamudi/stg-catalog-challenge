@@ -206,3 +206,4 @@ O sistema é uma solução para um e-commerce que contem as seguintes funcionali
 - [x] Animações
 - [x] Otimização de imagens
 - [x] Lazy Loading
+- [x] Filtros Avançados (faixa de preço, categoria, ordenar por: Nome(a-z), nome(z-a), Preço(menor), preço(maior))
