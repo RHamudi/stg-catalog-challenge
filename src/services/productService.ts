@@ -14,7 +14,7 @@ export const getAllProducts = async (): Promise<IProduct[]> => {
     return products || [];
 }
 
-export const AddProductCart  = async (cartModal: ICart): Promise<unknown> => {
+export const AddProductCart  = async (cartModal: ICart): Promise<any> => {
     const {data: cart, error} = await supabase.from('cart_items')
     .insert([
         cartModal
@@ -29,7 +29,7 @@ export const AddProductCart  = async (cartModal: ICart): Promise<unknown> => {
     return cart;
 }
 
-export const GetUserCart = async (userId: string): Promise<unknown> => {
+export const GetUserCart = async (userId: string): Promise<any> => {
     const { data, error } = await supabase.from('cart_items')
     .select(`id,
             quantity,
@@ -45,7 +45,7 @@ export const GetUserCart = async (userId: string): Promise<unknown> => {
     return data;
 }
 
-export const RemoveFromCart = async (itemId: string): Promise<unknown> => {
+export const RemoveFromCart = async (itemId: string): Promise<any> => {
     const { data, error } = await supabase
         .from('cart_items')
         .delete()
@@ -59,7 +59,7 @@ export const RemoveFromCart = async (itemId: string): Promise<unknown> => {
     return data;
 }
 
-export const UpdateCartItemQuantity = async (itemId: string, newQuantity: number): Promise<unknown> => {
+export const UpdateCartItemQuantity = async (itemId: string, newQuantity: number): Promise<any> => {
     const { data, error } = await supabase
         .from('cart_items')
         .update({ quantity: newQuantity })
@@ -73,7 +73,7 @@ export const UpdateCartItemQuantity = async (itemId: string, newQuantity: number
     return data;
 }
 
-export const GetProductById = async (productId: string): Promise<unknown> => {
+export const GetProductById = async (productId: string): Promise<any> => {
     const { data, error } = await supabase.from('products')
     .select('*').eq('id', productId)
     .single();
