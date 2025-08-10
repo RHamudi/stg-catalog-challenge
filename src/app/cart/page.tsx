@@ -3,6 +3,12 @@ import { useCart } from '@/context/cartContext';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { finalizarCompra } from '@/services/whatsService';
+import { ShoppingBasket, Trash, Undo2 } from 'lucide-react';
+import { Button } from '@/components/ui';
+import { useRouter } from 'next/navigation';
+import { UserAuth } from '@/context/authContext';
+import { saveOrder } from '@/services/orderService';
+import { IOrders, IOrdersSubmit } from '@/types';
 
 interface Coupon {
     code: string;
@@ -14,6 +20,8 @@ export default function ShoppingCart() {
     const [couponCode, setCouponCode] = useState<string>('');
     const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
     const [isLoadingCoupon, setIsLoadingCoupon] = useState<boolean>(false);
+    const { session } = UserAuth();
+    const router = useRouter();
 
     const {
         cartItems,
@@ -61,7 +69,18 @@ export default function ShoppingCart() {
     };
 
     const handleFinalizarCompra = () => {
-        finalizarCompra(cartItems, appliedCoupon, subtotal);
+        if (session) {
+            const order: IOrdersSubmit = {
+                customer_email: session.user.user_metadata.email,
+                customer_name: session.user.user_metadata.name,
+                notes: "",
+                shipping: shipping.toString(),
+                total_amount: total
+            }
+            saveOrder(order, cartItems);
+            finalizarCompra(cartItems, appliedCoupon, subtotal);
+        }
+
     };
 
     return (
@@ -75,9 +94,7 @@ export default function ShoppingCart() {
                                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                                 aria-label="Voltar"
                             >
-                                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
+                                <Undo2 size={40} color="#0f0f0f" strokeWidth={1.75} />
                             </Link >
                             <h1 className="text-2xl font-bold text-gray-900">Meu Carrinho</h1>
                         </div>
@@ -112,18 +129,24 @@ export default function ShoppingCart() {
                                     <span className="ml-3 text-gray-600">Carregando carrinho...</span>
                                 </div>
                             ) : cartItems.length === 0 ? (
-                                <div className="text-center py-12">
-                                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
-                                    </svg>
+                                <div className="flex flex-col justify-center items-center text-center py-12">
+                                    <ShoppingBasket size={152} color="#0f0f0f" strokeWidth={1.75} />
                                     <h3 className="text-lg font-medium text-gray-900 mb-2">Seu carrinho está vazio</h3>
                                     <p className="text-gray-500 mb-4">Adicione alguns produtos para começar suas compras!</p>
-                                    <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                                    <Button
+                                        size='md'
+                                        onClick={() => router.push('/products')}
+                                        className="w-50 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
                                         Ver Produtos
-                                    </button>
+                                    </Button>
                                 </div>
                             ) : (
-                                <div className="space-y-6">
+                                <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 
+                                     [&::-webkit-scrollbar]:w-2 
+                                     [&::-webkit-scrollbar-track]:bg-gray-100 
+                                     [&::-webkit-scrollbar-thumb]:bg-gray-300 
+                                     [&::-webkit-scrollbar-thumb]:rounded-full
+                                     [&::-webkit-scrollbar-thumb:hover]:bg-gray-400">
                                     {cartItems.map((item) => (
                                         <div key={item.id} className="flex gap-4 p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
                                             <div className="flex-shrink-0">
@@ -147,9 +170,7 @@ export default function ShoppingCart() {
                                                         className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                                                         aria-label={`Remover ${item.products.name} do carrinho`}
                                                     >
-                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
+                                                        <Trash />
                                                     </button>
                                                 </div>
 
@@ -220,7 +241,7 @@ export default function ShoppingCart() {
                                                 placeholder="Digite seu cupom"
                                                 value={couponCode}
                                                 onChange={(e) => setCouponCode(e.target.value)}
-                                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="flex-1 text-black px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 aria-label="Código do cupom"
                                             />
                                             <button
@@ -248,7 +269,7 @@ export default function ShoppingCart() {
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Subtotal</span>
-                                    <span className="font-medium">R$ {subtotal.toFixed(2).replace('.', ',')}</span>
+                                    <span className="font-medium text-black">R$ {subtotal.toFixed(2).replace('.', ',')}</span>
                                 </div>
 
                                 <div className="flex justify-between">
@@ -257,7 +278,7 @@ export default function ShoppingCart() {
                                         {shipping === 0 ? (
                                             <span className="font-medium text-green-600">Grátis</span>
                                         ) : (
-                                            <span className="font-medium">R$ {shipping.toFixed(2).replace('.', ',')}</span>
+                                            <span className="font-medium text-black">R$ {shipping.toFixed(2).replace('.', ',')}</span>
                                         )}
                                         {shippingDiscount > 0 && (
                                             <div className="text-sm text-green-600">
@@ -287,8 +308,8 @@ export default function ShoppingCart() {
 
                                 <div className="border-t pt-4">
                                     <div className="flex justify-between text-lg font-bold">
-                                        <span>Total</span>
-                                        <span>R$ {total.toFixed(2).replace('.', ',')}</span>
+                                        <span className='text-black'>Total</span>
+                                        <span className='text-black'>R$ {total.toFixed(2).replace('.', ',')}</span>
                                     </div>
                                 </div>
                             </div>
