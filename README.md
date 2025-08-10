@@ -179,13 +179,11 @@ O sistema é uma solução para um e-commerce que contem as seguintes funcionali
 - [x] Listagem de pedidos por usuário
 - [x] Detalhes completos de cada pedido
 - [x] Ordenação por data (mais recente primeiro)
-- [x] Informações de contato e entrega
 
 ### **🎨 Interface e UX**
 
-- [x] Design responsivo (mobile-first)
-- [x] Modo escuro/claro com persistência
-- [x] Componentes acessíveis
+- [x] Design responsivo
+- [x] Componentes organizados
 - [x] Notificações toast
 - [x] Loading states
 - [x] Estados vazios (carrinho/histórico)
