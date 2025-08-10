@@ -204,3 +204,5 @@ O sistema é uma solução para um e-commerce que contem as seguintes funcionali
 - [x] Historicos de pedidos
 - [x] Filtros
 - [x] Animações
+- [x] Otimização de imagens
+- [x] Lazy Loading

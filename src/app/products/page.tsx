@@ -1,11 +1,11 @@
 "use client"
 import Navbar from "@/components/navbar";
-import ProductCard from "@/components/productCard";
 import { UserAuth } from "@/context/authContext";
 import isAuth from "@/lib/isAuth";
 import { IProduct } from "@/types";
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 
+const ProductCard = lazy(() => import("@/components/productCard"));
 
 function Products() {
 

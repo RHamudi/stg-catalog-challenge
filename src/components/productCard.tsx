@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { ShoppingCart } from 'lucide-react';
 import { Button } from './ui';
-
+import Image from 'next/image';
 
 const ProductCard = ({ product }: { product: IProduct }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +18,8 @@ const ProductCard = ({ product }: { product: IProduct }) => {
 
     const handleAddToCart = async (productId: string) => {
         if (!session) {
-            alert('Faça login para adicionar produtos ao carrinho!');
+            toast.error('Faça login para adicionar produtos ao carrinho!');
+            router.push('/login');
             return;
         }
 
@@ -41,10 +42,6 @@ const ProductCard = ({ product }: { product: IProduct }) => {
         }).format(price);
     };
 
-    const handleImageError = () => {
-        setImageError(true);
-    };
-
     const handleClick = (id: string) => {
         router.push(`/products/${id}`);
     };
@@ -55,30 +52,41 @@ const ProductCard = ({ product }: { product: IProduct }) => {
             <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-green-50/50 to-transparent group-hover:translate-x-full transition-transform duration-700"></div>
 
             {/* Category Badge */}
-            <div className="absolute top-4 left-4 z-10">
-                <span className="bg-gradient-to-r from-green-500 to-green-400 text-white text-xs font-medium px-3 py-1 rounded-full">
-                    {product.category}
-                </span>
-            </div>
+            {product.category && (
+                <div className="absolute top-4 left-4 z-10">
+                    <span className="bg-gradient-to-r from-green-500 to-green-400 text-white text-xs font-medium px-3 py-1 rounded-full">
+                        {product.category}
+                    </span>
+                </div>
+            )}
 
-            {/* Product Image */}
-            <div className="relative mb-4 overflow-hidden rounded-xl bg-gradient-to-br from-green-50 to-green-100/50">
+            {/* Product Image - Otimizada com next/image */}
+            <div className="relative mb-4 overflow-hidden rounded-xl bg-gradient-to-br from-green-50 to-green-100/50 aspect-square">
                 {imageError ? (
-                    <div className="w-full h-48 flex items-center justify-center text-6xl text-green-400">
+                    <div className="w-full h-full flex items-center justify-center text-6xl text-green-400">
                         🌿
                     </div>
                 ) : (
-                    <img
+                    <Image
                         src={product.image_url}
                         alt={product.name}
-                        onError={handleImageError}
-                        className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={() => setImageError(true)}
+                        placeholder="blur"
+                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+                        loading="lazy"
                     />
                 )}
 
                 {/* Quick View Overlay */}
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <button onClick={() => handleClick(product.id)} className="bg-white text-green-600 px-4 py-2 rounded-full font-medium transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <button
+                        onClick={() => handleClick(product.id)}
+                        className="bg-white text-green-600 px-4 py-2 rounded-full font-medium transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
+                        aria-label={`Visualizar detalhes de ${product.name}`}
+                    >
                         Visualizar
                     </button>
                 </div>
@@ -90,9 +98,11 @@ const ProductCard = ({ product }: { product: IProduct }) => {
                     {product.name}
                 </h3>
 
-                <p className="text-sm text-green-700/70 line-clamp-2 leading-relaxed">
-                    {product.description}
-                </p>
+                {product.description && (
+                    <p className="text-sm text-green-700/70 line-clamp-2 leading-relaxed">
+                        {product.description}
+                    </p>
+                )}
 
                 {/* Price */}
                 <div className="flex items-center justify-between">
@@ -100,8 +110,8 @@ const ProductCard = ({ product }: { product: IProduct }) => {
                         {formatPrice(product.price)}
                     </div>
 
-                    {/* Rating Stars (mock) */}
-                    <div className="flex items-center gap-1">
+                    {/* Rating Stars (mock) - Adicionado aria-label para acessibilidade */}
+                    <div className="flex items-center gap-1" aria-label="Avaliação: 4.8 estrelas">
                         {[...Array(5)].map((_, i) => (
                             <span key={i} className="text-yellow-400 text-sm">★</span>
                         ))}
@@ -117,14 +127,14 @@ const ProductCard = ({ product }: { product: IProduct }) => {
                         loading={isLoading}
                         variant='primary'
                         className='w-full'
+                        aria-label={`Adicionar ${product.name} ao carrinho`}
                     >
                         {isLoading ? (
-                            <>
-                                Adicionando...
-                            </>
+                            'Adicionando...'
                         ) : (
                             <>
-                                <ShoppingCart /> Adicionar
+                                <ShoppingCart className="w-4 h-4 mr-2" />
+                                Adicionar
                             </>
                         )}
                     </Button>
@@ -134,4 +144,4 @@ const ProductCard = ({ product }: { product: IProduct }) => {
     );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);
