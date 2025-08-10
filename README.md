@@ -1,36 +1,206 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛒 STG Catalog - E-commerce
 
-## Getting Started
+# Tecnologias
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=for-the-badge&logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
+![Supabase](https://img.shields.io/badge/supabase-green?style=for-the-badge)
+
+## 📋 Descrição do Projeto
+
+O sistema é uma solução para um e-commerce que contem as seguintes funcionalidades:
+
+# FUNCIONALIDADES PRINCIPAIS
+
+## Autenticação:
+
+- **Autenticação**
+- **Proteção de rotas**
+- **LogOut funcional**
+
+## Catálogo
+
+- **Grid responsivo com 12+ produtos**
+- **Busca/filtro por nome**
+- **Visualização detalhada**
+- **Adicionar ao carrinho**
+
+## Carrinho
+
+- **Lista de produtos**
+- **Editar quantidades**
+- **Finalizar via WhatsAp**
+
+## WhatsApp Integration
+
+- **Gerar mensagem formatada**
+- **Link wa.me automático**
+- **Limpar carrinho pós-envio**
+
+## 🚀 Tecnologias Utilizadas
+
+### **Frontend**
+
+- **Next.js** - Framework React com App Router
+- **TypeScript** - Tipagem estática
+- **Tailwind CSS** - Estilização utilitária
+- **Lucide React** - Ícones SVG
+- **Context API** - Gerenciamento de estado
+
+### **Back End**
+
+- **SupaBase**
+
+### IA Utilizada
+
+### **Cursor**
+
+- Utilizei o cursor para me dar sugestoes durante a codificação, e tambem para me
+  ajudar a identificar erros durante o desenvolvimento.
+
+### **claude.ai**
+
+- Utilizei a Cloude para me auxiliar na estilização com ideias de que padrão seguir dentro do meu site
+
+### **ChatGPT**
+
+- utilizei em alguns momentos para conseguir tirar duvidas e fazer pesquisas sobre codigos do supabase e sua utilização, por exemplos em como realizar consultas.
+  P
+
+## Como Rodar Localmente
+
+## **Pré requisitos**
+
+- Node.JS instalado
+- npm
+- Criar uma conta na supabase
+
+### **Intalação**
+
+1 - **Clone o repositorio**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+    git clone https://github.com/RHamudi/stg-catalog-challenge
+    cd stg-catalog-challenge
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2 - **Atualize as dependencias**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+    npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3 - **Adicione as variaveis de ambiente**
 
-## Learn More
+- Adicione as variaveis de ambiente no seu arquivo .env
 
-To learn more about Next.js, take a look at the following resources:
+```
+    NEXT_PUBLIC_SUPABASE_URL=
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3 - **Execute o projeto**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+    npm run dev
+```
 
-## Deploy on Vercel
+4 - **Acesse o navegador**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+    http://localhost:3000
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### **Scripts Disponíveis**
+
+```bash
+    npm run dev      # Inicia o servidor de desenvolvimento
+    npm run build    # Gera build de produção
+    npm run start    # Inicia servidor de produção
+    npm run lint     # Executa linting do código
+```
+
+## Links Funcionais
+
+### Deploy: https://stg-catalog-challenge-five.vercel.app/
+
+### **Funcionalidades**
+
+- 🔍 **Busca de produtos** - Pesquisa por nome/descrição
+- 🏷️ **Filtros por categoria** - Electronics, Clothing, Home, Sports
+- 📱 **Modal de produto** - Visualização detalhada
+- 📞 **WhatsApp Integration** - Finalização via WhatsApp
+- 📋 **Histórico de pedidos** - Acessível via menu do usuário
+- 🌙 **Toggle tema** - Modo claro/escuro
+
+## ✅ Checklist de Funcionalidades
+
+### **🔐 Autenticação**
+
+- [x] Sistema de login
+- [x] Registro de novos usuários
+- [x] Persistência de sessão ContextAPI
+- [x] Logout com limpeza de dados
+- [x] Proteção de rotas privadas
+
+### **📦 Catálogo de Produtos**
+
+- [x] Listagem de 12 produtos vindo da api
+- [x] Busca por nome
+- [x] Layout responsivo
+- [x] Modal de detalhes do produto
+- [x] Imagens placeholder dinâmicas
+- [x] Loading State em todas as paginas
+
+### **🛒 Carrinho de Compras**
+
+- [x] Adicionar produtos ao carrinho
+- [x] Atualizar quantidades
+- [x] Remover itens individuais
+- [x] Cálculo automático de totais
+- [x] Persistência durante a sessão
+- [x] Indicador visual na navbar
+- [x] Página dedicada do carrinho
+- [x] Cupom de desconto funcional
+
+### **📞 Sistema de Pedidos**
+
+- [x] Formulário de checkout completo
+- [x] Validação de campos obrigatórios
+- [x] Geração de mensagem WhatsApp formatada
+- [x] Abertura do WhatsApp
+- [x] Salvamento do pedido no histórico
+- [x] Limpeza automática do carrinho
+
+### **📊 Histórico de Pedidos**
+
+- [x] Pagina de histórico acessível
+- [x] Listagem de pedidos por usuário
+- [x] Detalhes completos de cada pedido
+- [x] Ordenação por data (mais recente primeiro)
+- [x] Informações de contato e entrega
+
+### **🎨 Interface e UX**
+
+- [x] Design responsivo (mobile-first)
+- [x] Modo escuro/claro com persistência
+- [x] Componentes acessíveis
+- [x] Notificações toast
+- [x] Loading states
+- [x] Estados vazios (carrinho/histórico)
+- [x] Navegação intuitiva
+
+### **⚡ Performance e Qualidade**
+
+- [x] Componentes otimizados
+- [x] Lazy loading de imagens
+- [x] Código limpo e organizado
+- [x] Tratamento de erros
+- [x] Validação de formulários
+
+# DIFERENCIAIS
+
+- [x] Historicos de pedidos
+- [x] Filtros
+- [x] Animações
