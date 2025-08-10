@@ -123,7 +123,7 @@ O sistema é uma solução para um e-commerce que contem as seguintes funcionali
 
 ## Links Funcionais
 
-### Deploy: https://stg-catalog-challenge-five.vercel.app/
+### Deploy: https://stg-catalog-challenge-fnjq.vercel.app/
 
 ### **Funcionalidades**
 
