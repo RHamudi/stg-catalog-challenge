@@ -1,30 +1,65 @@
 'use client';
 import { UserAuth } from "@/context/authContext";
+import { LockKeyhole, LogIn, Mail } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import { useFormValidation, validationRules } from "@/hooks/useFormValidation";
+import { ILoginForm } from "@/types";
 
 export default function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-
     const { signInUser } = UserAuth();
 
-    const handleSingIn = async (e: any) => {
+    const initialValues: ILoginForm = {
+        email: "",
+        password: ""
+    };
+
+    const rules = {
+        email: validationRules.email,
+        password: validationRules.password
+    };
+
+    const {
+        validateForm,
+        getFieldProps,
+        getFormValues,
+        hasErrors
+    } = useFormValidation(initialValues, rules);
+
+    const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setLoading(true);
-        const { success, data, error } = await signInUser(email, password);
-        if (error) {
-            console.log(error)
+
+        if (!validateForm()) {
+            toast.error('Por favor, corrija os erros no formulário');
+            return;
         }
 
-        if (data) {
-            toast.success('Successfully toasted!')
-            router.push('/products')
+        setLoading(true);
+        const formValues = getFormValues();
+
+        try {
+            const { success, data, error } = await signInUser(formValues.email, formValues.password);
+
+            if (error) {
+                toast.error(error);
+                return;
+            }
+
+            if (data) {
+                toast.success('Usuário logado com sucesso!');
+                router.push('/products');
+            }
+        } catch (error) {
+            toast.error('Erro inesperado. Tente novamente.');
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }
 
     return (
@@ -45,71 +80,46 @@ export default function Login() {
                 <h2 className="text-2xl font-bold text-center text-green-600">Bem-vindo de volta</h2>
                 <p className="text-center text-gray-600 mb-8">Entre na sua conta para continuar sua jornada</p>
 
-                <form onSubmit={handleSingIn} className="space-y-5">
+                <form onSubmit={handleSignIn} className="space-y-5">
                     {/* Email */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <div className="relative">
-                            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-green-500">
-                                📧
-                            </span>
-                            <input
-                                type="email"
-                                placeholder="exemplo@email.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700"
-                                required
-                            />
-                        </div>
-                    </div>
+                    <Input
+                        label="Email"
+                        type="email"
+                        placeholder="exemplo@email.com"
+                        icon={Mail}
+                        required
+                        {...getFieldProps('email')}
+                    />
 
                     {/* Senha */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                        <div className="relative">
-                            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-green-500">
-                                🔒
-                            </span>
-                            <input
-                                type="password"
-                                placeholder="********"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700"
-                                required
-                            />
-                            {/* Ícone olho aqui se quiser */}
-                        </div>
-                    </div>
+                    <Input
+                        label="Senha"
+                        type="password"
+                        placeholder="********"
+                        icon={LockKeyhole}
+                        required
+                        {...getFieldProps('password')}
+                    />
 
-                    {/* Lembrar-me + Esqueceu a senha */}
-                    <div className="flex justify-between items-center text-sm text-gray-600">
-                        <label className="flex items-center space-x-2">
-                            <input type="checkbox" className="form-checkbox text-green-500" />
-                            <span>Lembrar-me</span>
-                        </label>
-                        <a href="#" className="text-green-600 hover:underline">Esqueceu a senha?</a>
+                    {/* Esqueceu a senha */}
+                    <div className="flex justify-end">
+                        <Link href="#" className="text-sm text-green-600 hover:underline">
+                            Esqueceu a senha?
+                        </Link>
                     </div>
 
                     {/* Botão Entrar */}
-                    <button
+                    <Button
                         type="submit"
-                        disabled={loading}
-                        className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition duration-200 flex items-center justify-center gap-2"
+                        variant="primary"
+                        size="md"
+                        loading={loading}
+                        disabled={hasErrors}
+                        className="w-full"
                     >
-                        {loading ? (
-                            <div className="flex items-center justify-center gap-2">
-                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                Entrando...
-                            </div>
-                        ) : (
-                            <>
-                                <span>👤</span>
-                                Entrar
-                            </>
-                        )}
-                    </button>
+                        <LogIn className="w-5 h-5" />
+                        {loading ? 'Entrando...' : 'Entrar'}
+                    </Button>
                 </form>
 
                 {/* Divider
@@ -132,8 +142,8 @@ export default function Login() {
                 </div> */}
 
                 {/* Cadastro */}
-                <p className="text-center text-sm text-gray-600">
-                    Não tem uma conta? <a href="#" className="text-green-600 font-medium hover:underline">Criar conta gratuita</a>
+                <p className="text-center text-lg text-gray-600">
+                    Não tem uma conta? <Link href="/register" className="text-green-600 font-medium hover:underline">Criar conta gratuita</Link>
                 </p>
 
                 {/* Rodapé SSL */}

@@ -1,29 +1,76 @@
 'use client';
 
+import { Button, Input } from "@/components/ui";
 import { UserAuth } from "@/context/authContext";
+import { useFormValidation, validationRules } from "@/hooks/useFormValidation";
+import { IRegisterForm } from "@/types";
+import { ListChecks, LockKeyhole, Mail, SquarePlus, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Register() {
     const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     const { signUpNewUser } = UserAuth();
 
-    const handleSingUp = async (e: any) => {
-        e.preventDefault();
-        const { data, error } = await signUpNewUser(email, password, name);
+    const initialValues: IRegisterForm = {
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
+    }
 
-        if (error) {
-            console.log(error);
+    const {
+        validateForm,
+        getFieldProps,
+        getFormValues,
+        hasErrors,
+        fields
+    } = useFormValidation(initialValues, {
+        name: { required: true },
+        email: validationRules.email,
+        password: validationRules.password,
+        confirmPassword: {
+            required: true,
+            custom: (value: string) => {
+                const passwordValue = fields?.password?.value || '';
+                if (value && passwordValue && value !== passwordValue) {
+                    return 'As senhas não coincidem';
+                }
+                return null;
+            }
+        }
+    })
+
+    const handleSingUp = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (!validateForm()) {
+            toast.error("Por favor, corrija os erros no formulário")
         }
 
-        if (data) {
-            router.push('/login')
+        setLoading(true);
+        const formValues = getFormValues();
+
+        try {
+            const { data, error } = await signUpNewUser(formValues.email, formValues.password, formValues.name);
+            if (error) {
+                toast.error(error);
+                return
+            }
+
+            if (data) {
+                toast.success('Usuário logado com sucesso!');
+                router.push('/products');
+            }
+        } catch (error) {
+            toast.error('Erro inesperado. Tente novamente.');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -35,61 +82,63 @@ export default function Register() {
                 </h2>
                 <form onSubmit={handleSingUp} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Nome
-                        </label>
-                        <input
+                        <Input
+                            label="Nome"
                             type="text"
                             placeholder="Seu nome"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-                            onChange={(e) => setName(e.target.value)}
+                            required
+                            icon={User}
+                            {...getFieldProps('name')}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            E-mail
-                        </label>
-                        <input
+                        <Input
+                            label="Email"
                             type="email"
                             placeholder="seuemail@email.com"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-                            onChange={(e) => setEmail(e.target.value)}
+                            icon={Mail}
+                            required
+                            {...getFieldProps('email')}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Senha
-                        </label>
-                        <input
+                        <Input
+                            label="Senha"
                             type="password"
                             placeholder="********"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-                            onChange={(e) => setPassword(e.target.value)}
+                            icon={LockKeyhole}
+                            required
+                            {...getFieldProps('password')}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Confirmar Senha
-                        </label>
-                        <input
+                        <Input
+                            label="Confirme a senha"
                             type="password"
                             placeholder="********"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                            icon={ListChecks}
+                            required
+                            {...getFieldProps('confirmPassword')}
                         />
                     </div>
 
-                    <button
+                    <Button
                         type="submit"
-                        className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition duration-300"
+                        variant="primary"
+                        size="md"
+                        className="w-full "
+                        loading={loading}
                     >
-                        Registrar
-                    </button>
+                        {loading ? "Realizando cadastro..." : "Registrar"}
+                    </Button>
+
+
                 </form>
 
-                <p className="mt-6 text-center text-sm text-gray-600">
+                <p className="mt-6 text-center text-lg text-gray-600">
                     Já tem uma conta? <Link href="/login" className="text-green-600 font-medium hover:underline">Faça login</Link>
                 </p>
             </div>
