@@ -66,7 +66,7 @@ O sistema é uma solução para um e-commerce que contem as seguintes funcionali
 ### **ChatGPT**
 
 - utilizei em alguns momentos para conseguir tirar duvidas e fazer pesquisas sobre codigos do supabase e sua utilização, por exemplos em como realizar consultas.
-  P
+E para montar o planejamento de entrega no dia, para que o projeto fosse finalizado dentro do prazo estipulado.
 
 ## Como Rodar Localmente
 
@@ -143,6 +143,7 @@ O sistema é uma solução para um e-commerce que contem as seguintes funcionali
 - [x] Persistência de sessão ContextAPI
 - [x] Logout com limpeza de dados
 - [x] Proteção de rotas privadas
+- [x] Validaçõoes em todos os formularios
 
 ### **📦 Catálogo de Produtos**
 
@@ -199,8 +200,8 @@ O sistema é uma solução para um e-commerce que contem as seguintes funcionali
 
 # DIFERENCIAIS
 
-- [x] Historicos de pedidos
-- [x] Filtros
+- [x] Historicos de pedidos (Detalhes do pedido e soma total dos valores do pedido)
+- [x] Filtros por nome
 - [x] Animações
 - [x] Otimização de imagens
 - [x] Lazy Loading
