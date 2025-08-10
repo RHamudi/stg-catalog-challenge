@@ -50,7 +50,7 @@ function Products() {
                         Nossos Produtos
                     </h1>
                     <p className="text-green-600 text-center mb-12">
-                        Descubra nossa seleção de produtos sustentáveis e de alta qualidade
+                        Melhores produtos com as melhores qualidades.
                     </p>
 
                     {/* Campo de busca */}

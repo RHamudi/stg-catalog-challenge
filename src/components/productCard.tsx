@@ -4,6 +4,9 @@ import { IProduct } from '../types';
 import { UserAuth } from '@/context/authContext';
 import { useCart } from '@/context/cartContext';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { ShoppingCart } from 'lucide-react';
+import { Button } from './ui';
 
 
 const ProductCard = ({ product }: { product: IProduct }) => {
@@ -22,10 +25,10 @@ const ProductCard = ({ product }: { product: IProduct }) => {
         setIsLoading(true);
         try {
             await addToCart(productId, 1);
-            alert(`${product.name} adicionado ao carrinho!`);
+            toast.success(`${product.name} adicionado ao carrinho!`);
         } catch (error) {
             console.error('Erro ao adicionar ao carrinho:', error);
-            alert('Erro ao adicionar produto ao carrinho. Tente novamente.');
+            toast.error('Erro ao adicionar produto ao carrinho. Tente novamente.');
         } finally {
             setIsLoading(false);
         }
@@ -108,25 +111,23 @@ const ProductCard = ({ product }: { product: IProduct }) => {
 
                 {/* Action Buttons */}
                 <div className="flex gap-2 pt-2">
-                    <button
+                    <Button
                         onClick={() => handleAddToCart(product.id)}
                         disabled={isLoading}
-                        className={`flex-1 bg-gradient-to-r from-green-600 to-green-500 text-white py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${isLoading
-                            ? 'opacity-70 cursor-not-allowed'
-                            : 'hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/30'
-                            }`}
+                        loading={isLoading}
+                        variant='primary'
+                        className='w-full'
                     >
                         {isLoading ? (
                             <>
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                 Adicionando...
                             </>
                         ) : (
                             <>
-                                🛒 Adicionar
+                                <ShoppingCart /> Adicionar
                             </>
                         )}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
