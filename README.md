@@ -206,3 +206,4 @@ E para montar o planejamento de entrega no dia, para que o projeto fosse finaliz
 - [x] Otimização de imagens
 - [x] Lazy Loading
 - [x] Filtros Avançados (faixa de preço, categoria, ordenar por: Nome(a-z), nome(z-a), Preço(menor), preço(maior))
+- [x] criação de Hooks
