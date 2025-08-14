@@ -19,6 +19,10 @@ function Products() {
     const [isLoading, setIsLoading] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
 
+    // Estado para paginação
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 12;
+
     // Filtros avançados
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [priceRange, setPriceRange] = useState<PriceRange>([0, 1000]);
@@ -26,6 +30,12 @@ function Products() {
 
     // Obter categorias únicas
     const categories = [...new Set(products.map(product => product.category))];
+
+    // Calcular produtos paginados
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
     // Aplicar todos os filtros
     useEffect(() => {
@@ -70,8 +80,15 @@ function Products() {
             });
 
             setFilteredProducts(filtered);
+            // Resetar para a primeira página quando os filtros mudarem
+            setCurrentPage(1);
         }
     }, [products, searchTerm, selectedCategories, priceRange, sortOption]);
+
+    // Funções de paginação
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+    const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+    const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
 
     const toggleCategory = (category: string) => {
         setSelectedCategories(prev =>
@@ -157,8 +174,8 @@ function Products() {
                                             key={category}
                                             onClick={() => toggleCategory(category)}
                                             className={`px-3 py-1 rounded-full text-sm ${selectedCategories.includes(category)
-                                                    ? 'bg-green-600 text-white'
-                                                    : 'bg-green-100 text-green-800 hover:bg-green-200'
+                                                ? 'bg-green-600 text-white'
+                                                : 'bg-green-100 text-green-800 hover:bg-green-200'
                                                 }`}
                                         >
                                             {category}
@@ -225,8 +242,8 @@ function Products() {
                                     <button
                                         onClick={() => setSortOption('name-asc')}
                                         className={`px-4 py-2 rounded-lg border ${sortOption === 'name-asc'
-                                                ? 'bg-green-100 border-green-600 text-green-800'
-                                                : 'border-green-300 hover:bg-green-50'
+                                            ? 'bg-green-100 border-green-600 text-green-800'
+                                            : 'border-green-300 hover:bg-green-50'
                                             }`}
                                     >
                                         Nome (A-Z)
@@ -234,8 +251,8 @@ function Products() {
                                     <button
                                         onClick={() => setSortOption('name-desc')}
                                         className={`px-4 py-2 rounded-lg border ${sortOption === 'name-desc'
-                                                ? 'bg-green-100 border-green-600 text-green-800'
-                                                : 'border-green-300 hover:bg-green-50'
+                                            ? 'bg-green-100 border-green-600 text-green-800'
+                                            : 'border-green-300 hover:bg-green-50'
                                             }`}
                                     >
                                         Nome (Z-A)
@@ -243,8 +260,8 @@ function Products() {
                                     <button
                                         onClick={() => setSortOption('price-asc')}
                                         className={`px-4 py-2 rounded-lg border ${sortOption === 'price-asc'
-                                                ? 'bg-green-100 border-green-600 text-green-800'
-                                                : 'border-green-300 hover:bg-green-50'
+                                            ? 'bg-green-100 border-green-600 text-green-800'
+                                            : 'border-green-300 hover:bg-green-50'
                                             }`}
                                     >
                                         Preço (Menor)
@@ -252,8 +269,8 @@ function Products() {
                                     <button
                                         onClick={() => setSortOption('price-desc')}
                                         className={`px-4 py-2 rounded-lg border ${sortOption === 'price-desc'
-                                                ? 'bg-green-100 border-green-600 text-green-800'
-                                                : 'border-green-300 hover:bg-green-50'
+                                            ? 'bg-green-100 border-green-600 text-green-800'
+                                            : 'border-green-300 hover:bg-green-50'
                                             }`}
                                     >
                                         Preço (Maior)
@@ -291,11 +308,60 @@ function Products() {
                     {/* Lista de produtos */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         <Suspense fallback={<div className="col-span-3 text-center py-12">Carregando produtos...</div>}>
-                            {filteredProducts.map((product) => (
+                            {currentProducts.map((product) => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
                         </Suspense>
                     </div>
+
+                    {/* Paginação */}
+                    {filteredProducts.length > productsPerPage && (
+                        <div className="flex justify-center mt-12 mb-8">
+                            <nav className="flex items-center gap-2">
+                                <button
+                                    onClick={prevPage}
+                                    disabled={currentPage === 1}
+                                    className={`px-4 py-2 rounded-lg border ${currentPage === 1
+                                        ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+                                        : 'border-green-300 text-green-700 hover:bg-green-50'
+                                        }`}
+                                >
+                                    Anterior
+                                </button>
+
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+                                    <button
+                                        key={number}
+                                        onClick={() => paginate(number)}
+                                        className={`px-4 py-2 rounded-lg ${currentPage === number
+                                            ? 'bg-green-600 text-white'
+                                            : 'border border-green-300 text-green-700 hover:bg-green-50'
+                                            }`}
+                                    >
+                                        {number}
+                                    </button>
+                                ))}
+
+                                <button
+                                    onClick={nextPage}
+                                    disabled={currentPage === totalPages}
+                                    className={`px-4 py-2 rounded-lg border ${currentPage === totalPages
+                                        ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+                                        : 'border-green-300 text-green-700 hover:bg-green-50'
+                                        }`}
+                                >
+                                    Próxima
+                                </button>
+                            </nav>
+                        </div>
+                    )}
+
+                    {/* Mostrando produtos X-Y de Z */}
+                    {filteredProducts.length > 0 && (
+                        <div className="text-center text-green-600 mb-8">
+                            Mostrando {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, filteredProducts.length)} de {filteredProducts.length} produtos
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

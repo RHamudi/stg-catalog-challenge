@@ -5,6 +5,7 @@ import { useCart } from "@/context/cartContext";
 import { AddProductCart, GetProductById } from "@/services/productService";
 import { ICart, IProduct } from "@/types";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -20,6 +21,8 @@ export default function ProductDetailPage({ params }: any) {
     const [isProductLoading, setIsProductLoading] = useState(true);
     const [isFavorite, setIsFavorite] = useState(false);
     const [imageError, setImageError] = useState(false);
+    const { session } = UserAuth();
+    const router = useRouter();
     const [product, setProduct] = useState<IProduct>({
         name: "",
         category: "",
@@ -47,6 +50,11 @@ export default function ProductDetailPage({ params }: any) {
     };
 
     const handleAddToCart = async () => {
+        if (!session) {
+            toast.error('Faça login para adicionar produtos ao carrinho!');
+            router.push('/login');
+            return;
+        }
         setIsLoading(true);
         // Simular chamada de API
         addToCart(product.id, quantity).then(() => {
